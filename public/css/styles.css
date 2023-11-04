@@ -1,0 +1,23 @@
+
+body {
+  background-color: #E8ECEF;
+  background: linear-gradient(45deg, #E8ECEF, #c2ced3 50%);
+  height: 100vh;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.centered {
+    padding-top: 200px;
+    text-align: center;
+}
+
+.secret-text {
+  text-align: center;
+  font-size: 2rem;
+  color: #fff;
+  background-color: #000;
+}

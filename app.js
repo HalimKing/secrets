@@ -4,7 +4,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const ejs = require("ejs");
-const encrypt = require("mongoose-encryption");
+// const encrypt = require("mongoose-encryption");
+// const md5 = require("md5");
+const bcrypt = require('bcrypt');
+
+const saltRounds = 10;
 
 
 
@@ -22,7 +26,7 @@ const userSchema = new mongoose.Schema({
     password: String
 });
 
-userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ["password"] })
+
 
 const User = new mongoose.model("User",userSchema);
 
@@ -41,11 +45,12 @@ app.post("/login", function(req, res){
     .exec()
     .then((result)=>{
         if(result){
-            if(result.password === password){
-                res.render("secrets");
-            }else{
-                
-            }
+            bcrypt.compare(password, result.password, function(err, results) {
+                if(results === true){
+                    res.render("secrets")
+                }
+            });
+            
         }
     })
     .catch((err)=>{
@@ -60,16 +65,19 @@ app.get("/register", function(req,res){
 
 
 app.post("/register", function(req,res){
-    const userName = req.body.username;
-    const password = req.body.password;
-    const newUser = User({
-        email: userName,
-        password: password
+    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+        const userName = req.body.username;
+        const password = hash;
+        const newUser = User({
+            email: userName,
+            password: password
+        });
+       
+        newUser.save();
+        
+        res.redirect("/secrets");
     });
-   
-    newUser.save();
     
-    res.redirect("/secrets");
 });
 
 app.get("/secrets", function(req,res){
